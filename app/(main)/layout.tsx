@@ -29,14 +29,15 @@ export default function RootLayout({
           content="bYfY6Sf3ofOdZk0g1hEPEEfYXTDo8SxKDCd8WIf0enE"
         />
       </head>
-      <body
+      <h1>Dead Web</h1>
+      {/* <body
         className={`${inter.className} bg-[#030014] overflow-y-scroll overflow-x-hidden`}
       >
         <StarsCanvas />
         <Navbar />
         {children}
         <Footer />
-      </body>
+      </body> */}
     </html>
   );
 }
