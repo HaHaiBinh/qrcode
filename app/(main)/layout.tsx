@@ -4,6 +4,7 @@ import "../globals.css";
 import StarsCanvas from "@/components/main/StarBackground";
 import Navbar from "@/components/main/Navbar";
 import Footer from "@/components/main/Footer";
+import QRCode from "@/components/qrcode/QRCode";
 // import { usePathname } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -29,15 +30,16 @@ export default function RootLayout({
           content="bYfY6Sf3ofOdZk0g1hEPEEfYXTDo8SxKDCd8WIf0enE"
         />
       </head>
-      <h1>Dead Web</h1>
-      {/* <body
-        className={`${inter.className} bg-[#030014] overflow-y-scroll overflow-x-hidden`}
+
+      <body
+      // className={`${inter.className} bg-[#030014] overflow-y-scroll overflow-x-hidden`}
       >
-        <StarsCanvas />
+        <QRCode />
+        {/* <StarsCanvas />
         <Navbar />
         {children}
-        <Footer />
-      </body> */}
+        <Footer /> */}
+      </body>
     </html>
   );
 }
