@@ -5,10 +5,24 @@ import React, { useState } from "react";
 
 const ACTIVATION_TOP = "78%";
 const ACTIVATION_SIZE = "20%";
-const RIPPLE_ZONES = [
-  { left: "13%", top: "90%", size: "18%", delay: "0s" },
-  { left: "50%", top: "95%", size: "15%", delay: "0.08s" },
-  { left: "86%", top: "90%", size: "18%", delay: "0.16s" },
+const ROAD_GLOW_LINES = [
+  { left: "-10%", top: "86%", width: "50%", rotate: "-7deg", delay: "0s" },
+  { left: "-14%", top: "87%", width: "50%", rotate: "-7deg", delay: "0s" },
+  { left: "-8%", top: "91%", width: "50%", rotate: "-15deg", delay: "0s" },
+  { left: "-8.5%", top: "91.5%", width: "50%", rotate: "-15.5deg", delay: "0s" },
+  { left: "-10%", top: "94%", width: "50%", rotate: "-20deg", delay: "0s" },
+  { left: "0%", top: "98%", width: "50%", rotate: "-30deg", delay: "0s" },
+  { left: "13%", top: "100%", width: "28%", rotate: "-44deg", delay: "0s" },
+  { left: "30%", top: "100%", width: "20%", rotate: "-60deg", delay: "0s" },
+
+  { left: "63%", top: "83.3%", width: "37%", rotate: "3.5deg", delay: "0s" },
+  { left: "63%", top: "83.2%", width: "37%", rotate: "10.5deg", delay: "0s" },
+  { left: "60%", top: "83.5%", width: "42%", rotate: "14.5deg", delay: "0s" },
+  { left: "61.5%", top: "84%", width: "42%", rotate: "16deg", delay: "0s" },
+  { left: "56%", top: "83%", width: "50%", rotate: "27deg", delay: "0s" },
+  { left: "66%", top: "87%", width: "40%", rotate: "33deg", delay: "0s" },
+  { left: "68%", top: "90.5%", width: "25%", rotate: "41deg", delay: "0s" },
+  { left: "60%", top: "90.5%", width: "20%", rotate: "57deg", delay: "0s" },
 ];
 
 const QRCodePage = () => {
@@ -53,26 +67,41 @@ const QRCodePage = () => {
         </div>
 
         <div className="pointer-events-none absolute inset-0 z-20">
-          {bursts.map((burstId) =>
-            RIPPLE_ZONES.map((zone, index) => (
-              <div
-                key={`${burstId}-${index}`}
-                className="qr-ripple-zone"
-                style={
-                  {
-                    left: zone.left,
-                    top: zone.top,
-                    width: zone.size,
-                    "--zone-delay": zone.delay,
-                  } as React.CSSProperties
-                }
-              >
-                <span className="qr-ripple-circle qr-ripple-circle-1" />
-                <span className="qr-ripple-circle qr-ripple-circle-2" />
-                <span className="qr-ripple-circle qr-ripple-circle-3" />
-              </div>
-            )),
-          )}
+          {/* {ROAD_GLOW_LINES.map((line, index) => (
+            <span
+              key={`preview-${index}`}
+              className="qr-road-glow-line qr-road-glow-line-preview"
+              style={
+                {
+                  left: line.left,
+                  top: line.top,
+                  width: line.width,
+                  "--line-rotate": line.rotate,
+                  "--line-delay": line.delay,
+                } as React.CSSProperties
+              }
+            />
+          ))} */}
+
+          {bursts.map((burstId) => (
+            <div key={burstId} className="absolute inset-0">
+              {ROAD_GLOW_LINES.map((line, index) => (
+                <span
+                  key={index}
+                  className="qr-road-glow-line"
+                  style={
+                    {
+                      left: line.left,
+                      top: line.top,
+                      width: line.width,
+                      "--line-rotate": line.rotate,
+                      "--line-delay": line.delay,
+                    } as React.CSSProperties
+                  }
+                />
+              ))}
+            </div>
+          ))}
         </div>
       </div>
 
@@ -124,64 +153,82 @@ const QRCodePage = () => {
           border-color: rgba(255, 255, 190, 0.75);
         }
 
-        .qr-ripple-zone {
+        .qr-road-glow-line {
           position: absolute;
-          aspect-ratio: 1;
-          transform: translate(-50%, -50%);
+          height: 4px;
           border-radius: 9999px;
-          mix-blend-mode: screen;
-        }
-
-        .qr-ripple-marker {
-          opacity: 0.9;
-        }
-
-        .qr-ripple-marker-ring {
-          position: absolute;
-          border-radius: 9999px;
-          border: 2px dashed rgba(255, 47, 110, 0.95);
-          background: rgba(255, 47, 110, 0.08);
-          box-shadow: 0 0 18px rgba(255, 47, 110, 0.42);
-        }
-
-        .qr-ripple-marker-ring-1 {
-          inset: 0;
-        }
-
-        .qr-ripple-marker-ring-2 {
-          inset: 18%;
-          border-color: rgba(255, 255, 120, 0.9);
-          background: rgba(255, 255, 120, 0.06);
-        }
-
-        .qr-ripple-marker-ring-3 {
-          inset: 35%;
-          border-color: rgba(60, 255, 120, 0.9);
-          background: rgba(60, 255, 120, 0.08);
-        }
-
-        .qr-ripple-circle {
-          position: absolute;
-          inset: 0;
-          border-radius: 9999px;
-          border: 2px solid rgba(214, 255, 116, 0.92);
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(77, 255, 66, 0.22) 12%,
+            rgba(164, 255, 68, 0.95) 42%,
+            rgba(255, 255, 210, 1) 52%,
+            rgba(93, 255, 67, 0.85) 64%,
+            transparent
+          );
           box-shadow:
-            0 0 10px rgba(222, 255, 137, 0.9),
-            0 0 28px rgba(64, 255, 91, 0.5),
-            inset 0 0 18px rgba(150, 255, 94, 0.3);
+            0 0 8px rgba(224, 255, 134, 0.95),
+            0 0 18px rgba(77, 255, 66, 0.82),
+            0 0 42px rgba(82, 255, 76, 0.48);
           opacity: 0;
-          animation: qr-zone-ripple 1.35s ease-out forwards;
-          animation-delay: var(--zone-delay);
+          transform: rotate(var(--line-rotate)) scaleX(0.18);
+          transform-origin: left center;
+          mix-blend-mode: screen;
+          animation: qr-road-line-flash 1.45s ease-out forwards;
+          animation-delay: var(--line-delay);
         }
 
-        .qr-ripple-circle-2 {
-          animation-delay: calc(var(--zone-delay) + 0.16s);
-          border-color: rgba(255, 255, 180, 0.8);
+        .qr-road-glow-line::before {
+          content: "";
+          position: absolute;
+          inset: -10px 0;
+          border-radius: 9999px;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(117, 255, 68, 0.32),
+            rgba(255, 255, 205, 0.42),
+            transparent
+          );
+          filter: blur(8px);
         }
 
-        .qr-ripple-circle-3 {
-          animation-delay: calc(var(--zone-delay) + 0.32s);
-          border-color: rgba(118, 255, 89, 0.72);
+        .qr-road-glow-line::after {
+          content: "";
+          position: absolute;
+          left: 8%;
+          top: 50%;
+          width: 28%;
+          height: 180%;
+          border-radius: 9999px;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(132, 255, 77, 0.42),
+            rgba(255, 255, 215, 0.9),
+            rgba(132, 255, 77, 0.42),
+            transparent
+          );
+          box-shadow:
+            0 0 12px rgba(192, 255, 112, 0.78),
+            0 0 28px rgba(87, 255, 66, 0.58);
+          filter: blur(2px);
+          transform: translateY(-50%);
+          animation: qr-road-sweep 1.45s ease-out forwards;
+          animation-delay: var(--line-delay);
+        }
+
+        .qr-road-glow-line-preview {
+          opacity: 0.68;
+          transform: rotate(var(--line-rotate)) scaleX(1);
+          animation: qr-road-line-preview 1.9s ease-in-out infinite;
+          animation-delay: var(--line-delay);
+        }
+
+        .qr-road-glow-line-preview::after {
+          opacity: 0.8;
+          animation: qr-road-sweep-preview 1.9s ease-in-out infinite;
+          animation-delay: var(--line-delay);
         }
 
         @keyframes qr-outside-wave {
@@ -212,20 +259,64 @@ const QRCodePage = () => {
           }
         }
 
-        @keyframes qr-zone-ripple {
+        @keyframes qr-road-line-flash {
           0% {
             opacity: 0;
-            transform: scale(0.18);
+            filter: brightness(0.9) blur(0.4px);
+            transform: rotate(var(--line-rotate)) scaleX(0.12);
           }
-          18% {
-            opacity: 0.95;
+          24% {
+            opacity: 1;
+            filter: brightness(1.85) blur(0);
+            transform: rotate(var(--line-rotate)) scaleX(1);
           }
-          70% {
-            opacity: 0.55;
+          62% {
+            opacity: 0.62;
+            filter: brightness(1.25) blur(0.2px);
+            transform: rotate(var(--line-rotate)) scaleX(0.95);
           }
           100% {
             opacity: 0;
-            transform: scale(1.9);
+            filter: brightness(0.8);
+            transform: rotate(var(--line-rotate)) scaleX(0.55);
+          }
+        }
+
+        @keyframes qr-road-sweep {
+          0% {
+            opacity: 0;
+            left: -18%;
+          }
+          28% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 0;
+            left: 92%;
+          }
+        }
+
+        @keyframes qr-road-line-preview {
+          0%,
+          100% {
+            opacity: 0.36;
+            filter: brightness(0.95) blur(0.4px);
+          }
+          50% {
+            opacity: 0.78;
+            filter: brightness(1.55) blur(0);
+          }
+        }
+
+        @keyframes qr-road-sweep-preview {
+          0%,
+          100% {
+            opacity: 0.35;
+            left: -12%;
+          }
+          50% {
+            opacity: 0.85;
+            left: 76%;
           }
         }
       `}</style>
