@@ -30,12 +30,8 @@ const ROAD_GLOW_LINES = [
 const QRCodePage = () => {
   const [activeBurst, setActiveBurst] = useState<number | null>(null);
   const isHoldingRef = useRef(false);
-  const loopTimerRef = useRef<ReturnType<typeof window.setInterval> | null>(
-    null,
-  );
-  const cleanupTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(
-    null,
-  );
+  const loopTimerRef = useRef<number | null>(null);
+  const cleanupTimerRef = useRef<number | null>(null);
 
   const clearTimers = () => {
     if (loopTimerRef.current) {
