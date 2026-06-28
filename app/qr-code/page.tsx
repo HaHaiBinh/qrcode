@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 const ACTIVATION_TOP = "78%";
 const ACTIVATION_SIZE = "20%";
@@ -12,8 +12,8 @@ const ROAD_GLOW_LINES = [
   { left: "-8.5%", top: "91.5%", width: "50%", rotate: "-15.5deg", delay: "0s" },
   { left: "-10%", top: "94%", width: "50%", rotate: "-20deg", delay: "0s" },
   { left: "0%", top: "98%", width: "50%", rotate: "-30deg", delay: "0s" },
-  { left: "13%", top: "100%", width: "28%", rotate: "-44deg", delay: "0s" },
-  { left: "30%", top: "100%", width: "20%", rotate: "-60deg", delay: "0s" },
+  { left: "13%", top: "99.7%", width: "28%", rotate: "-44deg", delay: "0s" },
+  { left: "30%", top: "99.7%", width: "20%", rotate: "-60deg", delay: "0s" },
 
   { left: "63%", top: "83.3%", width: "37%", rotate: "3.5deg", delay: "0s" },
   { left: "63%", top: "83.2%", width: "37%", rotate: "10.5deg", delay: "0s" },
@@ -22,18 +22,23 @@ const ROAD_GLOW_LINES = [
   { left: "56%", top: "83%", width: "50%", rotate: "27deg", delay: "0s" },
   { left: "66%", top: "87%", width: "40%", rotate: "33deg", delay: "0s" },
   { left: "68%", top: "90.5%", width: "25%", rotate: "41deg", delay: "0s" },
-  { left: "60%", top: "90.5%", width: "20%", rotate: "57deg", delay: "0s" },
+  { left: "60%", top: "90.3%", width: "20%", rotate: "57deg", delay: "0s" },
 ];
 
 const QRCodePage = () => {
-  const [bursts, setBursts] = useState<number[]>([]);
+  const [activeBurst, setActiveBurst] = useState<number | null>(null);
+  const isAnimatingRef = useRef(false);
 
   const handleActivate = () => {
+    if (isAnimatingRef.current) return;
+
+    isAnimatingRef.current = true;
     const id = Date.now() + Math.random();
-    setBursts((current) => [...current, id]);
+    setActiveBurst(id);
     window.setTimeout(() => {
-      setBursts((current) => current.filter((burstId) => burstId !== id));
-    }, 1600);
+      setActiveBurst(null);
+      isAnimatingRef.current = false;
+    }, 1700);
   };
 
   return (
@@ -55,15 +60,15 @@ const QRCodePage = () => {
           className="pointer-events-none absolute left-1/2 z-20 aspect-square -translate-x-1/2 -translate-y-1/2"
           style={{ top: ACTIVATION_TOP, width: ACTIVATION_SIZE }}
         >
-          {bursts.map((burstId) => (
-            <div key={burstId} className="absolute inset-0">
+          {activeBurst !== null && (
+            <div key={activeBurst} className="absolute inset-0">
               <span className="qr-energy-halo" />
               <span className="qr-energy-ring qr-energy-ring-1" />
               <span className="qr-energy-ring qr-energy-ring-2" />
               <span className="qr-energy-ring qr-energy-ring-3" />
               <span className="qr-energy-ring qr-energy-ring-4" />
             </div>
-          ))}
+          )}
         </div>
 
         <div className="pointer-events-none absolute inset-0 z-20">
@@ -83,8 +88,8 @@ const QRCodePage = () => {
             />
           ))} */}
 
-          {bursts.map((burstId) => (
-            <div key={burstId} className="absolute inset-0">
+          {activeBurst !== null && (
+            <div key={activeBurst} className="absolute inset-0">
               {ROAD_GLOW_LINES.map((line, index) => (
                 <span
                   key={index}
@@ -101,7 +106,7 @@ const QRCodePage = () => {
                 />
               ))}
             </div>
-          ))}
+          )}
         </div>
       </div>
 
