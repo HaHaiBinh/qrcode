@@ -1,10 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const ACTIVATION_TOP = "78%";
 const ACTIVATION_SIZE = "20%";
+const ANIMATION_DURATION = 1700;
+const HOLD_LOOP_INTERVAL = 1450;
 const ROAD_GLOW_LINES = [
   { left: "-10%", top: "86%", width: "50%", rotate: "-7deg", delay: "0s" },
   { left: "-14%", top: "87%", width: "50%", rotate: "-7deg", delay: "0s" },
@@ -27,19 +29,72 @@ const ROAD_GLOW_LINES = [
 
 const QRCodePage = () => {
   const [activeBurst, setActiveBurst] = useState<number | null>(null);
-  const isAnimatingRef = useRef(false);
+  const isHoldingRef = useRef(false);
+  const loopTimerRef = useRef<ReturnType<typeof window.setInterval> | null>(
+    null,
+  );
+  const cleanupTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(
+    null,
+  );
 
-  const handleActivate = () => {
-    if (isAnimatingRef.current) return;
+  const clearTimers = () => {
+    if (loopTimerRef.current) {
+      window.clearInterval(loopTimerRef.current);
+      loopTimerRef.current = null;
+    }
 
-    isAnimatingRef.current = true;
+    if (cleanupTimerRef.current) {
+      window.clearTimeout(cleanupTimerRef.current);
+      cleanupTimerRef.current = null;
+    }
+  };
+
+  const triggerBurst = () => {
     const id = Date.now() + Math.random();
     setActiveBurst(id);
-    window.setTimeout(() => {
+
+    if (cleanupTimerRef.current) {
+      window.clearTimeout(cleanupTimerRef.current);
+    }
+
+    cleanupTimerRef.current = window.setTimeout(() => {
+      if (isHoldingRef.current) return;
       setActiveBurst(null);
-      isAnimatingRef.current = false;
-    }, 1700);
+      cleanupTimerRef.current = null;
+    }, ANIMATION_DURATION);
   };
+
+  const handleHoldStart = () => {
+    if (isHoldingRef.current) return;
+
+    isHoldingRef.current = true;
+    triggerBurst();
+    loopTimerRef.current = window.setInterval(
+      triggerBurst,
+      HOLD_LOOP_INTERVAL,
+    );
+  };
+
+  const handleHoldEnd = () => {
+    if (!isHoldingRef.current) return;
+
+    isHoldingRef.current = false;
+    if (loopTimerRef.current) {
+      window.clearInterval(loopTimerRef.current);
+      loopTimerRef.current = null;
+    }
+
+    if (cleanupTimerRef.current) {
+      window.clearTimeout(cleanupTimerRef.current);
+    }
+
+    cleanupTimerRef.current = window.setTimeout(() => {
+      setActiveBurst(null);
+      cleanupTimerRef.current = null;
+    }, ANIMATION_DURATION);
+  };
+
+  useEffect(() => clearTimers, []);
 
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-black">
@@ -49,7 +104,10 @@ const QRCodePage = () => {
         <button
           type="button"
           aria-label="Activate green energy"
-          onClick={handleActivate}
+          onPointerDown={handleHoldStart}
+          onPointerUp={handleHoldEnd}
+          onPointerLeave={handleHoldEnd}
+          onPointerCancel={handleHoldEnd}
           className="absolute left-1/2 z-10 aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full outline-none"
           style={{ top: ACTIVATION_TOP, width: ACTIVATION_SIZE }}
         >
