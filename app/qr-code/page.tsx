@@ -116,6 +116,20 @@ const QRCodePage = () => {
 
   useEffect(() => clearTimers, []);
 
+  useEffect(() => {
+    const preventLongPress = (e: TouchEvent) => {
+      e.preventDefault();
+    };
+
+    document.addEventListener("touchstart", preventLongPress, {
+      passive: false,
+    });
+
+    return () => {
+      document.removeEventListener("touchstart", preventLongPress);
+    };
+  }, []);
+
   return (
     <main
       className="min-h-screen w-full overflow-x-hidden bg-black"
@@ -127,6 +141,7 @@ const QRCodePage = () => {
           alt="QR code"
           draggable={false}
           onContextMenu={(event) => event.preventDefault()}
+          onTouchStart={(e) => e.preventDefault()} // 👈 thêm dòng này
           className="block h-auto w-full select-none"
         />
 
@@ -139,7 +154,7 @@ const QRCodePage = () => {
           onPointerCancel={handlePointerUp}
           onClick={startAnimationSequence}
           className="absolute left-1/2 z-10 aspect-square -translate-x-1/2 -translate-y-1/2 touch-none select-none rounded-full outline-none"
-          style={{ top: ACTIVATION_TOP, width: ACTIVATION_SIZE }}
+          style={{ top: ACTIVATION_TOP, width: ACTIVATION_SIZE, WebkitTouchCallout: "none", WebkitUserSelect: "none", userSelect: "none" }}
         >
           <span className="pointer-events-none absolute inset-[20%] rounded-full bg-lime-300/0 transition duration-300 active:bg-lime-200/15" />
         </button>
@@ -199,12 +214,18 @@ const QRCodePage = () => {
       </div>
 
       <style jsx>{`
+        :global(*) {
+        -webkit-touch-callout: none !important;
+        -webkit-user-select: none !important;
+        user-select: none !important;
+        }
         :global(html),
         :global(body) {
           -webkit-touch-callout: none;
           -webkit-tap-highlight-color: transparent;
           overscroll-behavior: none;
           user-select: none;
+          touch-action: manipulation; /* thêm dòng này */
         }
 
         :global(img),
@@ -212,6 +233,10 @@ const QRCodePage = () => {
           -webkit-user-drag: none;
           -webkit-touch-callout: none;
           user-select: none;
+        }
+
+        img {
+          pointer-events: none; /* 👈 cực kỳ quan trọng */
         }
 
         .qr-energy-halo,
