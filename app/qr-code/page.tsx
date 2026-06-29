@@ -7,6 +7,7 @@ const ACTIVATION_TOP = "78%";
 const ACTIVATION_SIZE = "20%";
 const ANIMATION_DURATION = 1700;
 const HOLD_LOOP_INTERVAL = 1450;
+const SEQUENCE_DURATION = 10000;
 const ROAD_GLOW_LINES = [
   { left: "-10%", top: "86%", width: "50%", rotate: "-7deg", delay: "0s" },
   { left: "-14%", top: "87%", width: "50%", rotate: "-7deg", delay: "0s" },
@@ -29,9 +30,11 @@ const ROAD_GLOW_LINES = [
 
 const QRCodePage = () => {
   const [activeBurst, setActiveBurst] = useState<number | null>(null);
-  const isHoldingRef = useRef(false);
+  const isSequenceRunningRef = useRef(false);
+  const isPointerDownRef = useRef(false);
   const loopTimerRef = useRef<number | null>(null);
   const cleanupTimerRef = useRef<number | null>(null);
+  const sequenceTimerRef = useRef<number | null>(null);
 
   const clearTimers = () => {
     if (loopTimerRef.current) {
@@ -43,6 +46,11 @@ const QRCodePage = () => {
       window.clearTimeout(cleanupTimerRef.current);
       cleanupTimerRef.current = null;
     }
+
+    if (sequenceTimerRef.current) {
+      window.clearTimeout(sequenceTimerRef.current);
+      sequenceTimerRef.current = null;
+    }
   };
 
   const triggerBurst = () => {
@@ -53,41 +61,57 @@ const QRCodePage = () => {
       window.clearTimeout(cleanupTimerRef.current);
     }
 
-    cleanupTimerRef.current = window.setTimeout(() => {
-      if (isHoldingRef.current) return;
-      setActiveBurst(null);
-      cleanupTimerRef.current = null;
-    }, ANIMATION_DURATION);
+    cleanupTimerRef.current = null;
   };
 
-  const handleHoldStart = () => {
-    if (isHoldingRef.current) return;
+  const stopAnimationSequence = () => {
+    isSequenceRunningRef.current = false;
 
-    isHoldingRef.current = true;
-    triggerBurst();
-    loopTimerRef.current = window.setInterval(
-      triggerBurst,
-      HOLD_LOOP_INTERVAL,
-    );
-  };
-
-  const handleHoldEnd = () => {
-    if (!isHoldingRef.current) return;
-
-    isHoldingRef.current = false;
     if (loopTimerRef.current) {
       window.clearInterval(loopTimerRef.current);
       loopTimerRef.current = null;
     }
 
-    if (cleanupTimerRef.current) {
-      window.clearTimeout(cleanupTimerRef.current);
-    }
-
     cleanupTimerRef.current = window.setTimeout(() => {
       setActiveBurst(null);
       cleanupTimerRef.current = null;
     }, ANIMATION_DURATION);
+  };
+
+  const startAnimationSequence = () => {
+    if (isSequenceRunningRef.current) return;
+
+    isSequenceRunningRef.current = true;
+    triggerBurst();
+    loopTimerRef.current = window.setInterval(
+      triggerBurst,
+      HOLD_LOOP_INTERVAL,
+    );
+
+    sequenceTimerRef.current = window.setTimeout(() => {
+      sequenceTimerRef.current = null;
+
+      if (isPointerDownRef.current) {
+        isSequenceRunningRef.current = false;
+        if (loopTimerRef.current) {
+          window.clearInterval(loopTimerRef.current);
+          loopTimerRef.current = null;
+        }
+        startAnimationSequence();
+        return;
+      }
+
+      stopAnimationSequence();
+    }, SEQUENCE_DURATION);
+  };
+
+  const handlePointerDown = () => {
+    isPointerDownRef.current = true;
+    startAnimationSequence();
+  };
+
+  const handlePointerUp = () => {
+    isPointerDownRef.current = false;
   };
 
   useEffect(() => clearTimers, []);
@@ -100,10 +124,11 @@ const QRCodePage = () => {
         <button
           type="button"
           aria-label="Activate green energy"
-          onPointerDown={handleHoldStart}
-          onPointerUp={handleHoldEnd}
-          onPointerLeave={handleHoldEnd}
-          onPointerCancel={handleHoldEnd}
+          onPointerDown={handlePointerDown}
+          onPointerUp={handlePointerUp}
+          onPointerLeave={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onClick={startAnimationSequence}
           className="absolute left-1/2 z-10 aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full outline-none"
           style={{ top: ACTIVATION_TOP, width: ACTIVATION_SIZE }}
         >
