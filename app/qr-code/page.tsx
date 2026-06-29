@@ -117,9 +117,18 @@ const QRCodePage = () => {
   useEffect(() => clearTimers, []);
 
   return (
-    <main className="min-h-screen w-full overflow-x-hidden bg-black">
+    <main
+      className="min-h-screen w-full overflow-x-hidden bg-black"
+      onContextMenu={(event) => event.preventDefault()}
+    >
       <div className="relative w-full">
-        <img src="/BTN.jpg" alt="QR code" className="block h-auto w-full" />
+        <img
+          src="/BTN.jpg"
+          alt="QR code"
+          draggable={false}
+          onContextMenu={(event) => event.preventDefault()}
+          className="block h-auto w-full select-none"
+        />
 
         <button
           type="button"
@@ -129,7 +138,7 @@ const QRCodePage = () => {
           onPointerLeave={handlePointerUp}
           onPointerCancel={handlePointerUp}
           onClick={startAnimationSequence}
-          className="absolute left-1/2 z-10 aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full outline-none"
+          className="absolute left-1/2 z-10 aspect-square -translate-x-1/2 -translate-y-1/2 touch-none select-none rounded-full outline-none"
           style={{ top: ACTIVATION_TOP, width: ACTIVATION_SIZE }}
         >
           <span className="pointer-events-none absolute inset-[20%] rounded-full bg-lime-300/0 transition duration-300 active:bg-lime-200/15" />
@@ -190,6 +199,21 @@ const QRCodePage = () => {
       </div>
 
       <style jsx>{`
+        :global(html),
+        :global(body) {
+          -webkit-touch-callout: none;
+          -webkit-tap-highlight-color: transparent;
+          overscroll-behavior: none;
+          user-select: none;
+        }
+
+        :global(img),
+        :global(button) {
+          -webkit-user-drag: none;
+          -webkit-touch-callout: none;
+          user-select: none;
+        }
+
         .qr-energy-halo,
         .qr-energy-ring {
           position: absolute;
